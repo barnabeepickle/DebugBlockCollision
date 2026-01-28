@@ -6,6 +6,13 @@ bin
 .classpath
 .project
 
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
 # gradle
 build
 .gradle
@@ -13,5 +20,3 @@ build
 # other
 eclipse
 run
-libs
-extra
