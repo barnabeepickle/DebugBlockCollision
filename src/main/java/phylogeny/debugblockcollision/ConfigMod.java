@@ -12,12 +12,12 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Config(modid = DebugBlockCollision.MOD_ID, category = "")
-@LangKey(DebugBlockCollision.MOD_ID + ".config.title")
+@Config(modid = Tags.MODID, category = "")
+@LangKey(Tags.MODID + ".config.title")
 @EventBusSubscriber(Side.CLIENT)
 public class ConfigMod
 {
-	private static final String PREFIX = "config." + DebugBlockCollision.MOD_ID + ".client";
+	private static final String PREFIX = "config." + Tags.MODID + ".client";
 
 	@Name("Client")
 	@Comment("Client-only configs.")
@@ -82,7 +82,7 @@ public class ConfigMod
 	@SubscribeEvent
 	public static void onConfigChanged(OnConfigChangedEvent event)
 	{
-		if (event.getModID().equalsIgnoreCase(DebugBlockCollision.MOD_ID))
-			ConfigManager.sync(DebugBlockCollision.MOD_ID, Type.INSTANCE);
+		if (event.getModID().equalsIgnoreCase(Tags.MODID))
+			ConfigManager.sync(Tags.MODID, Type.INSTANCE);
 	}
 }

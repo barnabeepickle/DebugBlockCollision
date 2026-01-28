@@ -1,22 +1,12 @@
 package phylogeny.debugblockcollision;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import org.apache.logging.log4j.Logger;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -28,46 +18,53 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.settings.KeyConflictContext;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToAccessFieldException;
 import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindMethodException;
 import net.minecraftforge.fml.relauncher.Side;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 import phylogeny.debugblockcollision.ConfigMod.Mode;
 
-@EventBusSubscriber(Side.CLIENT)
-@Mod(modid = DebugBlockCollision.MOD_ID,
-	 version = DebugBlockCollision.VERSION,
-	 acceptedMinecraftVersions = DebugBlockCollision.MC_VERSIONS_ACCEPTED,
-	 updateJSON = DebugBlockCollision.UPDATE_JSON,
-	 clientSideOnly = DebugBlockCollision.CLIENT_OLNY)
+import javax.annotation.Nullable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@Mod(modid = Tags.MODID,
+	 version = Tags.VERSION,
+	 clientSideOnly = true)
+@Mod.EventBusSubscriber(Side.CLIENT)
 public class DebugBlockCollision
 {
-	public static final String MOD_ID = "debugblockcollision";
-	public static final String MOD_NAME = "Debug Block Collision";
-	public static final String MOD_PATH = "phylogeny." + MOD_ID;
-	public static final String VERSION = "@VERSION@";
-	public static final String UPDATE_JSON = "@UPDATE@";
-	public static final String MC_VERSIONS_ACCEPTED = "[1.12.2,)";
 	public static final boolean CLIENT_OLNY = true;
 	public static final String MODE_COMMENT = "If set to 'Blocks In Radius', all collision/bounding boxes that are not single full-blocks will render within a "
 			+ "radius around the player. If set to 'Boxes Collided', only collision/bounding boxes that the player is currently colliding with will render. If "
 			+ "set to 'Blocks Hovered', only the collision/bounding of the block the player is looking at will render (sneaking will cause only the single box "
 			+ "looked at to render). [full collision boxes = green; non-full collision boxes = blue; bounding boxes (for blocks with no collision boxes) = red]";
 
-	public static Logger logger;
+	public static final Logger LOGGER = LogManager.getLogger(Tags.MODID);
 
 	private static boolean enabled;
 	private static Configuration configFile;
+
+	static KeyBinding keyBind;
 
 	public static Configuration getConfigFile() throws Exception
 	{
@@ -76,11 +73,11 @@ public class DebugBlockCollision
 			try
 			{
 				Method getConfiguration = ReflectionHelper.findMethod(ConfigManager.class, "getConfiguration", null, String.class, String.class);
-				configFile = (Configuration) getConfiguration.invoke(new ConfigManager(), DebugBlockCollision.MOD_ID, null);
+				configFile = (Configuration) getConfiguration.invoke(new ConfigManager(), Tags.MODID, null);
 			}
 			catch (UnableToFindMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
 			{
-				logger.error("Failed to get config file instance", e);
+				LOGGER.error("Failed to get config file instance", e);
 				throw(e);
 			}
 		}
@@ -90,23 +87,18 @@ public class DebugBlockCollision
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		logger = event.getModLog();
+		keyBind = new KeyBinding("key." + Tags.MODID + ".overlay", KeyConflictContext.IN_GAME, Keyboard.KEY_F9, "key.category." + Tags.MODID);
+		ClientRegistry.registerKeyBinding(keyBind);
+		MinecraftForge.EVENT_BUS.register(ClientEventListener.class);
 	}
 
-	@EventHandler
-	public void init(@SuppressWarnings("unused") FMLInitializationEvent event)
+	public static void handleOverlay(TickEvent.ClientTickEvent event) throws Exception
 	{
-		KeyBindingsMod.init();
-	}
-
-	@SubscribeEvent
-	public static void toggleEnabled(@SuppressWarnings("unused") KeyInputEvent event) throws Exception
-	{
-//		System.out.println(KeyBindingsMod.MODE.isPressed());
 		if (Keyboard.isKeyDown(Keyboard.KEY_F3))
 		{
-			if (!KeyBindingsMod.MODE.isPressed())
+			if (!keyBind.isPressed()) {
 				return;
+			}
 
 			// Toggle enabled and prevent debug screen from toggling on/off
 			try
@@ -116,7 +108,7 @@ public class DebugBlockCollision
 			}
 			catch (UnableToAccessFieldException e)
 			{
-				logger.error("Failed to toggle debug block collision box visibility", e);
+				LOGGER.error("Failed to toggle debug block collision box visibility", e);
 				throw(e);
 			}
 
@@ -126,9 +118,9 @@ public class DebugBlockCollision
 			// Display color key
 			if (enabled)
 				Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentTranslation("debug."
-						+ DebugBlockCollision.MOD_ID + ".color_key").setStyle(new Style().setColor(TextFormatting.DARK_GREEN)));
+						+ Tags.MODID + ".color_key").setStyle(new Style().setColor(TextFormatting.DARK_GREEN)));
 		}
-		else if (enabled && KeyBindingsMod.MODE.isPressed())
+		else if (enabled && keyBind.isPressed())
 		{
 			// Cycle mode
 			Mode mode = ConfigMod.CLIENT.mode;
@@ -151,13 +143,13 @@ public class DebugBlockCollision
 		try
 		{
 			Method debugFeedbackTranslated = ReflectionHelper.findMethod(Minecraft.class, "debugFeedbackTranslated", "func_190521_a", String.class, Object[].class);
-			String debug = "debug." + DebugBlockCollision.MOD_ID;
+			String debug = "debug." + Tags.MODID;
 			debugFeedbackTranslated.invoke(Minecraft.getMinecraft(), debug,
 					new Object[]{new TextComponentTranslation(debug + "." + keySuffix).setStyle(new Style().setColor(TextFormatting.DARK_AQUA))});
 		}
 		catch (UnableToFindMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
 		{
-			logger.error("Failed to send feedback for toggling of debug block collision box visibility", e);
+			LOGGER.error("Failed to send feedback for toggling of debug block collision box visibility", e);
 			throw(e);
 		}
 	}
@@ -287,7 +279,7 @@ public class DebugBlockCollision
 		state.addCollisionBoxToList(world, pos, TileEntity.INFINITE_EXTENT_AABB, boxesCollision, null, true);
 
 		// Remove null boxes
-		boxesCollision.removeIf(box -> box == null);
+		boxesCollision.removeIf(Objects::isNull);
 
 		// Ignore solitary full-blocks
 		if (!renderSolitaryFullBoxes && boxesCollision.size() == 1 && boxesCollision.get(0).equals(Block.FULL_BLOCK_AABB.offset(pos)))
@@ -318,7 +310,7 @@ public class DebugBlockCollision
 
 	private static class ColoredBox extends AxisAlignedBB
 	{
-		private Color color;
+		private final Color color;
 
 		public ColoredBox(AxisAlignedBB box, boolean isBoundingBox)
 		{
