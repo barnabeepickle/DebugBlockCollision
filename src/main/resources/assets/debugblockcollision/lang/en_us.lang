@@ -1,6 +1,7 @@
-key.category.debugblockcollision=Debug Block Collision
+key.category.debugblockcollision=Debug Block Collision Overlay
 
-key.debugblockcollision.mode=Box Render Mode
+key.debugblockcollision.overlay=Toggle Box Rendering
+key.debugblockcollision.mode=Change Box Render Mode
 
 debug.debugblockcollision=Block collision boxes: %s
 debug.debugblockcollision.on=shown
@@ -10,7 +11,7 @@ debug.debugblockcollision.collided=only collision/bounding boxes that the player
 debug.debugblockcollision.hovered=only the collision/bounding of the block the player is looking at will render (sneaking will cause only the single box looked at to render).
 debug.debugblockcollision.color_key=§fColor key: §2full collision boxes§r / §1non-full collision boxes§r / §4bounding boxes (for blocks with no collision boxes)
 
-config.debugblockcollision.title=Debug Block Collision GUI Config
+config.debugblockcollision.title=Debug Block Collision Overlay Config GUI
 config.debugblockcollision.client=Client
 config.debugblockcollision.client.tooltip=Client-only configs.
 config.debugblockcollision.client.mode=Mode
