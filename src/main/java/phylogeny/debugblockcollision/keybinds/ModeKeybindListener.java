@@ -50,6 +50,6 @@ public class ModeKeybindListener {
         configFile.save();
 
         // Send chat message
-        debugFeedbackTranslated(ConfigMod.CLIENT.mode.getChatKey());
+        debugFeedbackTranslated("debug." + Tags.MODID + "." + ConfigMod.CLIENT.mode.getChatKey());
     }
 }
