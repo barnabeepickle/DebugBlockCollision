@@ -4,7 +4,7 @@
     "1.12.2-2.0.0": "Changelog: https://github.com/barnabeepickle/DebugBlockCollision/releases"
   },
   "promos": {
-    "1.12.2-latest": "1.12.2-2.0.0",
-    "1.12.2-recommended": "1.12.2-2.0.0"
+    "1.12.2-latest": "2.0.0",
+    "1.12.2-recommended": "2.0.0"
   }
 }
