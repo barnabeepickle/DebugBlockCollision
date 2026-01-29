@@ -6,34 +6,26 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.client.settings.KeyConflictContext;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 import phylogeny.debugblockcollision.ConfigMod.Mode;
+import phylogeny.debugblockcollision.keybinds.ModeKeybindListener;
+import phylogeny.debugblockcollision.keybinds.OverlayKeybindListener;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -54,10 +46,9 @@ public class DebugBlockCollision
 
 	public static final Logger LOGGER = LogManager.getLogger(Tags.MODID);
 
-	private static Configuration configFile;
+	public static Configuration configFile;
 
-	private static boolean enabled;
-	static KeyBinding keyBind;
+	public static boolean overlayEnabled;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -66,53 +57,18 @@ public class DebugBlockCollision
 			configFile.load();
 		}
 
-		keyBind = new KeyBinding("key." + Tags.MODID + ".mode", KeyConflictContext.IN_GAME, Keyboard.KEY_O, "key.category." + Tags.MODID);
-		ClientRegistry.registerKeyBinding(keyBind);
-		MinecraftForge.EVENT_BUS.register(ClientEventListener.class);
+		OverlayKeybindListener.init();
+		ModeKeybindListener.init();
 	}
 
-	public static void handleOverlay(@SuppressWarnings("unused") TickEvent.ClientTickEvent event) {
-		if (enabled) {
-			// Cycle mode
-			Mode mode = ConfigMod.CLIENT.mode;
-			ConfigMod.CLIENT.mode = mode.values()[(mode.ordinal() + 1) % mode.values().length];
-
-			// Update config file
-			configFile.load();
-			Property prop = configFile.get("client", "Mode", Mode.BLOCK_HOVERED.name());
-			prop.setValue(ConfigMod.CLIENT.mode.name());
-			prop.setComment(MODE_COMMENT);
-			configFile.save();
-
-			// Send chat message
-			debugFeedbackTranslated(ConfigMod.CLIENT.mode.getChatKey());
-		} else if (Keyboard.isKeyDown(Keyboard.KEY_F3)) {
-			// Toggle enabled and prevent debug screen from toggling on/off
-			// Simplified with the wonders of an at entry
-			Minecraft.getMinecraft().actionKeyF3 = true;
-
-			enabled ^=true;
-
-			// Send chat message
-			debugFeedbackTranslated(enabled ? "on" : "off");
-
-			// Display color key
-			if (enabled) {
-				Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(
-						new TextComponentTranslation("debug." + Tags.MODID + ".color_key")
-								.setStyle(new Style().setColor(TextFormatting.DARK_GREEN)));
-			}
-		}
-	}
-
-	private static void debugFeedbackTranslated(String keySuffix) {
-		// This was a lot more complicated using reflection but an at entry can do wonders
+	public static void debugFeedbackTranslated(String keySuffix) {
+		// This was a lot more complicated using reflection but an AT entry can do wonders
 		Minecraft.getMinecraft().debugFeedbackTranslated(keySuffix);
 	}
 
 	@SubscribeEvent
 	public static void renderCollisionBoxes(RenderWorldLastEvent event) {
-		if (!enabled) {
+		if (!overlayEnabled) {
 			return;
 		}
 
@@ -220,8 +176,9 @@ public class DebugBlockCollision
 
 	private static boolean addBoxesToList(World world, BlockPos pos, boolean renderSolitaryFullBoxes, @Nullable AxisAlignedBB playerBoundingBox, List<ColoredBox> boxes) {
 		IBlockState state = world.getBlockState(pos).getActualState(world, pos);
-		if (state.getBlock().isAir(state, world, pos))
+		if (state.getBlock().isAir(state, world, pos)) {
 			return true;
+		}
 
 		// Attempt to collect all collision boxes
 		List<AxisAlignedBB> boxesCollision = new ArrayList<>();
