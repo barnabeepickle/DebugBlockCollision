@@ -13,8 +13,10 @@ class ClientEventListener {
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
-            while (keyBind.isPressed() && Keyboard.isKeyDown(Keyboard.KEY_F3)) {
-                DebugBlockCollision.handleOverlay(event);
+            if (Keyboard.isKeyDown(Keyboard.KEY_F3)) {
+                while (keyBind.isPressed()) {
+                    DebugBlockCollision.handleOverlay(event);
+                }
             }
         }
     }

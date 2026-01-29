@@ -1,6 +1,6 @@
-itemGroup.debugblockcollision=Debug Block Collision
+key.category.debugblockcollision=Debug Block Collision
 
-keybinding.debugblockcollision.mode=Box Render Mode
+key.debugblockcollision.mode=Box Render Mode
 
 debug.debugblockcollision=Block collision boxes: %s
 debug.debugblockcollision.on=shown

@@ -66,17 +66,27 @@ public class DebugBlockCollision
 			configFile.load();
 		}
 
-		keyBind = new KeyBinding("key." + Tags.MODID + ".overlay", KeyConflictContext.IN_GAME, Keyboard.KEY_F9, "key.category." + Tags.MODID);
+		keyBind = new KeyBinding("key." + Tags.MODID + ".mode", KeyConflictContext.IN_GAME, Keyboard.KEY_O, "key.category." + Tags.MODID);
 		ClientRegistry.registerKeyBinding(keyBind);
 		MinecraftForge.EVENT_BUS.register(ClientEventListener.class);
 	}
 
 	public static void handleOverlay(@SuppressWarnings("unused") TickEvent.ClientTickEvent event) {
-		if (Keyboard.isKeyDown(Keyboard.KEY_F3)) {
-			if (!keyBind.isPressed()) {
-				return;
-			}
+		if (enabled) {
+			// Cycle mode
+			Mode mode = ConfigMod.CLIENT.mode;
+			ConfigMod.CLIENT.mode = mode.values()[(mode.ordinal() + 1) % mode.values().length];
 
+			// Update config file
+			configFile.load();
+			Property prop = configFile.get("client", "Mode", Mode.BLOCK_HOVERED.name());
+			prop.setValue(ConfigMod.CLIENT.mode.name());
+			prop.setComment(MODE_COMMENT);
+			configFile.save();
+
+			// Send chat message
+			debugFeedbackTranslated(ConfigMod.CLIENT.mode.getChatKey());
+		} else if (Keyboard.isKeyDown(Keyboard.KEY_F3)) {
 			// Toggle enabled and prevent debug screen from toggling on/off
 			// Simplified with the wonders of an at entry
 			Minecraft.getMinecraft().actionKeyF3 = true;
@@ -92,20 +102,6 @@ public class DebugBlockCollision
 						new TextComponentTranslation("debug." + Tags.MODID + ".color_key")
 								.setStyle(new Style().setColor(TextFormatting.DARK_GREEN)));
 			}
-		} else if (enabled && keyBind.isPressed()) {
-			// Cycle mode
-			Mode mode = ConfigMod.CLIENT.mode;
-			ConfigMod.CLIENT.mode = mode.values()[(mode.ordinal() + 1) % mode.values().length];
-
-			// Update config file
-			configFile.load();
-			Property prop = configFile.get("client", "Mode", Mode.BLOCK_HOVERED.name());
-			prop.setValue(ConfigMod.CLIENT.mode.name());
-			prop.setComment(MODE_COMMENT);
-			configFile.save();
-
-			// Send chat message
-			debugFeedbackTranslated(ConfigMod.CLIENT.mode.getChatKey());
 		}
 	}
 
