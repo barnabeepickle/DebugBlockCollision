@@ -6,19 +6,40 @@ key.debugblockcollision.mode=Change Box Rendering Mode
 debug.debugblockcollision=Block collision boxes: %s
 debug.debugblockcollision.on=Overlay Shown
 debug.debugblockcollision.off=Overlay Hidden
-debug.debugblockcollision.radius=All collision/bounding boxes that are not single full-blocks will render within a radius around the player.
-debug.debugblockcollision.collided=Only collision/bounding boxes that the player is currently colliding with will render.
-debug.debugblockcollision.hovered=Only the collision/bounding of the block the player is looking at will render (sneaking will cause only the single box looked at to render).
-debug.debugblockcollision.color_key=§fColor key: §2Green = Full Collision Boxes§r / §1Blue = Non-Full Collision Boxes§r / §4Red = Bounding Boxes (for blocks with no collision boxes)
+
+debug.debugblockcollision.radius=Mode: Radius
+debug.debugblockcollision.radius.info=All collision/bounding boxes that are not single full-blocks will render within a radius around the player.
+
+debug.debugblockcollision.collided=Mode: Collision
+debug.debugblockcollision.collided.info=Only collision/bounding boxes that the player is currently colliding with will render.
+
+debug.debugblockcollision.hovered=Mode: Crosshair
+debug.debugblockcollision.hovered.info=Only the collision/bounding of the block the player is looking at will render (sneaking will cause only the single box looked at to render).
+
+debug.debugblockcollision.color_key=§fOverlay Color Key:
+debug.debugblockcollision.color_key.green=§2Green §r= §2Full Collision Boxes
+debug.debugblockcollision.color_key.blue=§9Blue §r= §9Non-Full Collision Boxes
+debug.debugblockcollision.color_key.red=§4Red §r= §4Bounding Boxes (for blocks with no collision boxes)
 
 config.debugblockcollision.title=Debug Block Collision Overlay Config GUI
+
 config.debugblockcollision.client=Client
 config.debugblockcollision.client.tooltip=Client-only configs.
+
 config.debugblockcollision.client.mode=Mode
 config.debugblockcollision.client.mode.tooltip=If set to 'Blocks In Radius', all collision/bounding boxes that are not single full-blocks will render within a radius around the player. If set to 'Boxes Collided', only collision/bounding boxes that the player is currently colliding with will render. If set to 'Blocks Hovered', only the collision/bounding of the block the player is looking at will render (sneaking will cause only the single box looked at to render). [full collision boxes = green; non-full collision boxes = blue; bounding boxes (for blocks with no collision boxes) = red]
+
+config.debugblockcollision.client.colorkey=Show Color Key
+config.debugblockcollision.client.colorkey.tooltip=If enabled when toggling the overlay on/off it will send the color key in chat for the box colors.
+
+config.debugblockcollision.client.modedescription=Show Mode Description
+config.debugblockcollision.client.modedescription.tooltip=If enabled the descriptions for what each mode does will be sent in chat when you switch modes.
+
 config.debugblockcollision.client.radius=Render Radius
 config.debugblockcollision.client.radius.tooltip=If mode is set to 'Blocks In Radius', this sets the radius in meters that those block boxes will render within.
+
 config.debugblockcollision.client.line_width=Box Line Width
 config.debugblockcollision.client.line_width.tooltip=The width that the lines of the boxes render with.
+
 config.debugblockcollision.client.obscured=Render Obscured Lines
 config.debugblockcollision.client.obscured.tooltip=If true, lines that would otherwise be obscured from view will render, but with decreased opacity.
