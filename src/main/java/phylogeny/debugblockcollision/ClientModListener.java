@@ -6,7 +6,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
-import static phylogeny.debugblockcollision.DebugBlockCollision.LOGGER;
 import static phylogeny.debugblockcollision.DebugBlockCollision.keyBind;
 
 class ClientEventListener {
