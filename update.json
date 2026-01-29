@@ -1,10 +1,10 @@
 {
-  "homepage": "https://minecraft.curseforge.com/projects/debug-block-collision",
+  "homepage": "https://github.com/barnabeepickle/DebugBlockCollision",
   "1.12.2": {
-    "1.12.2-1.0.3": "Changelog: https://minecraft.curseforge.com/projects/debug-block-collision/files/2613483"
+    "1.12.2-2.0.0": "Changelog: https://github.com/barnabeepickle/DebugBlockCollision/releases"
   },
   "promos": {
-    "1.12.2-latest": "1.12.2-1.0.3",
-    "1.12.2-recommended": "1.12.2-1.0.3"
+    "1.12.2-latest": "1.12.2-2.0.0",
+    "1.12.2-recommended": "1.12.2-2.0.0"
   }
 }
