@@ -48,7 +48,7 @@ public class OverlayKeybindListener {
         overlayEnabled ^=true;
 
         // Send chat message
-        debugFeedbackTranslated("debug" + Tags.MODID + (overlayEnabled ? "on" : "off"));
+        debugFeedbackTranslated("debug." + Tags.MODID + (overlayEnabled ? ".on" : ".off"));
 
         // Display color key
         if (overlayEnabled) {
