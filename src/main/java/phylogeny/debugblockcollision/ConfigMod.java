@@ -35,7 +35,7 @@ public class ConfigMod
 		@Name("Show Mode Description")
 		@Comment("If enabled the descriptions for what each mode does will be sent in chat when you switch modes.")
 		@LangKey(PREFIX + ".modedescription")
-		public boolean modeDescription = true;
+		public boolean modeDescription = false;
 
 		@Name("Render Radius")
 		@Comment("If mode is set to 'Blocks In Radius', this sets the radius in meters that those block boxes will render within.")
