@@ -1,11 +1,7 @@
 package phylogeny.debugblockcollision;
 
 import net.minecraftforge.common.config.Config;
-import net.minecraftforge.common.config.Config.Comment;
-import net.minecraftforge.common.config.Config.LangKey;
-import net.minecraftforge.common.config.Config.Name;
-import net.minecraftforge.common.config.Config.RangeDouble;
-import net.minecraftforge.common.config.Config.Type;
+import net.minecraftforge.common.config.Config.*;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -55,14 +51,15 @@ public class ConfigMod
 		BOXES_COLLIDED("collided"),
 		BLOCK_HOVERED("hovered");
 
-		private String name, chatKey;
+		private String name;
+        private final String chatKey;
 
 		private Mode(String chatKey)
 		{
 			this.chatKey = chatKey;
 			name = "";
 			for (String word : name().split("_"))
-				name += word.substring(0, 1) + word.substring(1).toLowerCase() + " ";
+				name += word.charAt(0) + word.substring(1).toLowerCase() + " ";
 
 			name = name.substring(0, name.length() - 1);
 		}
