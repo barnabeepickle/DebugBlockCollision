@@ -19,7 +19,7 @@ public class ModeKeybindListener {
     public static KeyBinding modeKeybind;
 
     public static void init() {
-        modeKeybind = new KeyBinding("key." + Tags.MODID + ".mode", KeyConflictContext.IN_GAME, Keyboard.KEY_P, "key.category." + Tags.MODID);
+        modeKeybind = new KeyBinding("key." + Tags.MODID + ".mode", KeyConflictContext.IN_GAME, Keyboard.KEY_I, "key.category." + Tags.MODID);
         ClientRegistry.registerKeyBinding(modeKeybind);
         MinecraftForge.EVENT_BUS.register(ModeKeybindListener.class);
     }
