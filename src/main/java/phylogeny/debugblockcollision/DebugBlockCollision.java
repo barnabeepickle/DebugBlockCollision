@@ -41,7 +41,7 @@ public class DebugBlockCollision
 	public static final String MODE_COMMENT =
 			"If set to 'Blocks In Radius', all collision/bounding boxes that are not single full-blocks will render within a radius around the player. "
 			+ "If set to 'Boxes Collided', only collision/bounding boxes that the player is currently colliding with will render. "
-			+ "If set to 'Blocks Hovered', only the collision/bounding of the block the player is looking at will render (sneaking will cause only the single box "
+			+ "If set to 'Blocks Crosshair', only the collision/bounding of the block the player is looking at will render (sneaking will cause only the single box "
 			+ "looked at to render). [full collision boxes = green; non-full collision boxes = blue; bounding boxes (for blocks with no collision boxes) = red]";
 
 	public static final Logger LOGGER = LogManager.getLogger(Tags.MODID);
@@ -76,7 +76,7 @@ public class DebugBlockCollision
 		World world = player.world;
 		float ticks = event.getPartialTicks();
 		List<ColoredBox> boxes = new ArrayList<>();
-		if (ConfigMod.CLIENT.mode == Mode.BLOCK_HOVERED) {
+		if (ConfigMod.CLIENT.mode == Mode.BLOCK_CROSSHAIR) {
 			// Add all collision/bounding boxes for block looked at
 			RayTraceResult target = Minecraft.getMinecraft().objectMouseOver;
 			if (target == null || !target.typeOfHit.equals(RayTraceResult.Type.BLOCK) || addBoxesToList(world, target.getBlockPos(), true, boxes)) {

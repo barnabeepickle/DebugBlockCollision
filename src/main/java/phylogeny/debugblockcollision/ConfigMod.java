@@ -27,6 +27,16 @@ public class ConfigMod
 		@LangKey(PREFIX + ".mode")
 		public Mode mode = Mode.BLOCKS_IN_RADIUS;
 
+		@Name("Show Color Key")
+		@Comment("If enabled when toggling the overlay on/off it will send the color key in chat for the box colors.")
+		@LangKey(PREFIX + ".colorkey")
+		public boolean colorKey = true;
+
+		@Name("Show Mode Description")
+		@Comment("If enabled the descriptions for what each mode does will be sent in chat when you switch modes.")
+		@LangKey(PREFIX + ".modedescription")
+		public boolean modeDescription = true;
+
 		@Name("Render Radius")
 		@Comment("If mode is set to 'Blocks In Radius', this sets the radius in meters that those block boxes will render within.")
 		@LangKey(PREFIX + ".radius")
@@ -49,12 +59,12 @@ public class ConfigMod
 	{
 		BLOCKS_IN_RADIUS("radius"),
 		BOXES_COLLIDED("collided"),
-		BLOCK_HOVERED("hovered");
+		BLOCK_CROSSHAIR("hovered");
 
 		private String name;
         private final String chatKey;
 
-		private Mode(String chatKey)
+		Mode(String chatKey)
 		{
 			this.chatKey = chatKey;
 			name = "";

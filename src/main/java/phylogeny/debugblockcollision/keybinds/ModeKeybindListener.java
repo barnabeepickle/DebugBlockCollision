@@ -44,12 +44,15 @@ public class ModeKeybindListener {
 
         // Update config file
         configFile.load();
-        Property prop = configFile.get("client", "Mode", ConfigMod.Mode.BLOCK_HOVERED.name());
+        Property prop = configFile.get("client", "Mode", ConfigMod.Mode.BLOCK_CROSSHAIR.name());
         prop.setValue(ConfigMod.CLIENT.mode.name());
         prop.setComment(MODE_COMMENT);
         configFile.save();
 
         // Send chat message
         debugFeedbackTranslated("debug." + Tags.MODID + "." + ConfigMod.CLIENT.mode.getChatKey());
+        if (ConfigMod.CLIENT.modeDescription) {
+            debugFeedbackTranslated("debug." + Tags.MODID + "." + ConfigMod.CLIENT.mode.getChatKey() + ".info");
+        }
     }
 }

@@ -13,7 +13,11 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
+import phylogeny.debugblockcollision.ConfigMod;
 import phylogeny.debugblockcollision.Tags;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static phylogeny.debugblockcollision.DebugBlockCollision.debugFeedbackTranslated;
 import static phylogeny.debugblockcollision.DebugBlockCollision.overlayEnabled;
@@ -50,11 +54,21 @@ public class OverlayKeybindListener {
         // Send chat message
         debugFeedbackTranslated("debug." + Tags.MODID + (overlayEnabled ? ".on" : ".off"));
 
-        // Display color key
-        if (overlayEnabled) {
-            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(
-                    new TextComponentTranslation("debug." + Tags.MODID + ".color_key")
-                            .setStyle(new Style().setColor(TextFormatting.DARK_GREEN)));
+        // Display the color key if overlay enabled and it's enabled in the config
+        if (overlayEnabled && ConfigMod.CLIENT.colorKey) {
+            debugFeedbackTranslated("debug." + Tags.MODID + ".color_key");
+
+            List<String> colors = new ArrayList<>();
+            colors.add("green");
+            colors.add("blue");
+            colors.add("red");
+
+            for (int i = 0; !(i >= 3); i++) {
+                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(
+                        new TextComponentTranslation("debug." + Tags.MODID + ".color_key." + colors.get(i))
+                                .setStyle(new Style().setColor(TextFormatting.DARK_GREEN)));
+            }
+
         }
     }
 }
