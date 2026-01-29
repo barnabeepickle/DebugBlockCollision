@@ -20,7 +20,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -28,11 +27,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToAccessFieldException;
-import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindMethodException;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,8 +36,6 @@ import org.lwjgl.opengl.GL11;
 import phylogeny.debugblockcollision.ConfigMod.Mode;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -53,81 +46,59 @@ import java.util.Objects;
 @Mod.EventBusSubscriber(Side.CLIENT)
 public class DebugBlockCollision
 {
-	public static final boolean CLIENT_OLNY = true;
-	public static final String MODE_COMMENT = "If set to 'Blocks In Radius', all collision/bounding boxes that are not single full-blocks will render within a "
-			+ "radius around the player. If set to 'Boxes Collided', only collision/bounding boxes that the player is currently colliding with will render. If "
-			+ "set to 'Blocks Hovered', only the collision/bounding of the block the player is looking at will render (sneaking will cause only the single box "
+	public static final String MODE_COMMENT =
+			"If set to 'Blocks In Radius', all collision/bounding boxes that are not single full-blocks will render within a radius around the player. "
+			+ "If set to 'Boxes Collided', only collision/bounding boxes that the player is currently colliding with will render. "
+			+ "If set to 'Blocks Hovered', only the collision/bounding of the block the player is looking at will render (sneaking will cause only the single box "
 			+ "looked at to render). [full collision boxes = green; non-full collision boxes = blue; bounding boxes (for blocks with no collision boxes) = red]";
 
 	public static final Logger LOGGER = LogManager.getLogger(Tags.MODID);
 
-	private static boolean enabled;
 	private static Configuration configFile;
 
+	private static boolean enabled;
 	static KeyBinding keyBind;
 
-	public static Configuration getConfigFile() throws Exception
-	{
-		if (configFile == null)
-		{
-			try
-			{
-				Method getConfiguration = ReflectionHelper.findMethod(ConfigManager.class, "getConfiguration", null, String.class, String.class);
-				configFile = (Configuration) getConfiguration.invoke(new ConfigManager(), Tags.MODID, null);
-			}
-			catch (UnableToFindMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
-			{
-				LOGGER.error("Failed to get config file instance", e);
-				throw(e);
-			}
-		}
-		return configFile;
-	}
-
 	@EventHandler
-	public void preInit(FMLPreInitializationEvent event)
-	{
+	public void preInit(FMLPreInitializationEvent event) {
+		if (configFile == null) {
+			configFile = new Configuration(event.getSuggestedConfigurationFile());
+			configFile.load();
+		}
+
 		keyBind = new KeyBinding("key." + Tags.MODID + ".overlay", KeyConflictContext.IN_GAME, Keyboard.KEY_F9, "key.category." + Tags.MODID);
 		ClientRegistry.registerKeyBinding(keyBind);
 		MinecraftForge.EVENT_BUS.register(ClientEventListener.class);
 	}
 
-	public static void handleOverlay(TickEvent.ClientTickEvent event) throws Exception
-	{
-		if (Keyboard.isKeyDown(Keyboard.KEY_F3))
-		{
+	public static void handleOverlay(@SuppressWarnings("unused") TickEvent.ClientTickEvent event) {
+		if (Keyboard.isKeyDown(Keyboard.KEY_F3)) {
 			if (!keyBind.isPressed()) {
 				return;
 			}
 
 			// Toggle enabled and prevent debug screen from toggling on/off
-			try
-			{
-				ReflectionHelper.setPrivateValue(Minecraft.class, Minecraft.getMinecraft(), true, "actionKeyF3", "field_184129_aV");
-				enabled ^= true;
-			}
-			catch (UnableToAccessFieldException e)
-			{
-				LOGGER.error("Failed to toggle debug block collision box visibility", e);
-				throw(e);
-			}
+			// Simplified with the wonders of an at entry
+			Minecraft.getMinecraft().actionKeyF3 = true;
+
+			enabled ^=true;
 
 			// Send chat message
 			debugFeedbackTranslated(enabled ? "on" : "off");
 
 			// Display color key
-			if (enabled)
-				Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentTranslation("debug."
-						+ Tags.MODID + ".color_key").setStyle(new Style().setColor(TextFormatting.DARK_GREEN)));
-		}
-		else if (enabled && keyBind.isPressed())
-		{
+			if (enabled) {
+				Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(
+						new TextComponentTranslation("debug." + Tags.MODID + ".color_key")
+								.setStyle(new Style().setColor(TextFormatting.DARK_GREEN)));
+			}
+		} else if (enabled && keyBind.isPressed()) {
 			// Cycle mode
 			Mode mode = ConfigMod.CLIENT.mode;
 			ConfigMod.CLIENT.mode = mode.values()[(mode.ordinal() + 1) % mode.values().length];
 
 			// Update config file
-			Configuration configFile = getConfigFile();
+			configFile.load();
 			Property prop = configFile.get("client", "Mode", Mode.BLOCK_HOVERED.name());
 			prop.setValue(ConfigMod.CLIENT.mode.name());
 			prop.setComment(MODE_COMMENT);
@@ -138,40 +109,27 @@ public class DebugBlockCollision
 		}
 	}
 
-	private static void debugFeedbackTranslated(String keySuffix) throws Exception
-	{
-		try
-		{
-			Method debugFeedbackTranslated = ReflectionHelper.findMethod(Minecraft.class, "debugFeedbackTranslated", "func_190521_a", String.class, Object[].class);
-			String debug = "debug." + Tags.MODID;
-			debugFeedbackTranslated.invoke(Minecraft.getMinecraft(), debug,
-					new Object[]{new TextComponentTranslation(debug + "." + keySuffix).setStyle(new Style().setColor(TextFormatting.DARK_AQUA))});
-		}
-		catch (UnableToFindMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
-		{
-			LOGGER.error("Failed to send feedback for toggling of debug block collision box visibility", e);
-			throw(e);
-		}
+	private static void debugFeedbackTranslated(String keySuffix) {
+		// This was a lot more complicated using reflection but an at entry can do wonders
+		Minecraft.getMinecraft().debugFeedbackTranslated(keySuffix);
 	}
 
 	@SubscribeEvent
-	public static void renderCollisionBoxes(RenderWorldLastEvent event)
-	{
-		if (!enabled)
+	public static void renderCollisionBoxes(RenderWorldLastEvent event) {
+		if (!enabled) {
 			return;
+		}
 
 		EntityPlayer player = Minecraft.getMinecraft().player;
 		World world = player.world;
 		float ticks = event.getPartialTicks();
 		List<ColoredBox> boxes = new ArrayList<>();
-		if (ConfigMod.CLIENT.mode == Mode.BLOCK_HOVERED)
-		{
+		if (ConfigMod.CLIENT.mode == Mode.BLOCK_HOVERED) {
 			// Add all collision/bounding boxes for block looked at
 			RayTraceResult target = Minecraft.getMinecraft().objectMouseOver;
-			if (target == null || !target.typeOfHit.equals(RayTraceResult.Type.BLOCK) || addBoxesToList(world, target.getBlockPos(), true, boxes))
+			if (target == null || !target.typeOfHit.equals(RayTraceResult.Type.BLOCK) || addBoxesToList(world, target.getBlockPos(), true, boxes)) {
 				return;
-			else if (player.isSneaking())
-			{
+			} else if (player.isSneaking()) {
 				// Get the box looked at via a raytrace
 				double distanceSq;
 				double distanceSqShortest = Double.POSITIVE_INFINITY;
@@ -192,19 +150,17 @@ public class DebugBlockCollision
 						}
 					}
 				}
-				if (boxClosest == null)
+				if (boxClosest == null) {
 					return;
+				}
 
 				// Remove all but the box looked at
 				boxes.clear();
 				boxes.add(boxClosest);
 			}
-		}
-		else
-		{
+		} else {
 			double x, y, z;
-			if (ConfigMod.CLIENT.mode == Mode.BOXES_COLLIDED)
-			{
+			if (ConfigMod.CLIENT.mode == Mode.BOXES_COLLIDED) {
 				// Add all collision boxes that the player is collided with
 				AxisAlignedBB playerBoundingBox = player.getEntityBoundingBox().grow(0.001);
 				world.getCollisionBoxes(player, playerBoundingBox).forEach(box -> boxes.add(new ColoredBox(box, false)));
@@ -223,22 +179,18 @@ public class DebugBlockCollision
 						}
 					}
 				}
-			}
-			else
-			{
+			} else {
 				// Add all collision/bounding boxes within a radius of the player's eyes
 				double radius = ConfigMod.CLIENT.renderRadius;
 				Vec3d eyes = player.getPositionEyes(ticks);
 				AxisAlignedBB box = new AxisAlignedBB(new BlockPos(eyes)).grow(radius).offset(0.5, 0.5, 0.5);
 				double radiusSq = radius * radius;
-				for (x = box.minX; x < box.maxX; x++)
-				{
-					for (y = box.minY; y < box.maxY; y++)
-					{
-						for (z = box.minZ; z < box.maxZ; z++)
-						{
-							if (eyes.squareDistanceTo(x, y, z) <= radiusSq)
+				for (x = box.minX; x < box.maxX; x++) {
+					for (y = box.minY; y < box.maxY; y++) {
+						for (z = box.minZ; z < box.maxZ; z++) {
+							if (eyes.squareDistanceTo(x, y, z) <= radiusSq) {
 								addBoxesToList(world, new BlockPos(x, y, z), false, boxes);
+							}
 						}
 					}
 				}
@@ -249,13 +201,16 @@ public class DebugBlockCollision
 		double playerX = player.lastTickPosX + (player.posX - player.lastTickPosX) * ticks;
 		double playerY = player.lastTickPosY + (player.posY - player.lastTickPosY) * ticks;
 		double playerZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * ticks;
+
 		GlStateManager.enableBlend();
 		GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
 		GlStateManager.disableTexture2D();
 		GlStateManager.depthMask(false);
 		GlStateManager.glLineWidth(ConfigMod.CLIENT.lineWidth);
-		for (ColoredBox box : boxes)
+
+		for (ColoredBox box : boxes) {
 			box.render(playerX, playerY, playerZ);
+		}
 
 		GlStateManager.depthMask(true);
 		GlStateManager.enableTexture2D();
@@ -263,13 +218,11 @@ public class DebugBlockCollision
 		GlStateManager.glLineWidth(2.0F);
 	}
 
-	private static boolean addBoxesToList(World world, BlockPos pos, boolean renderSolitaryFullBoxes, List<ColoredBox> boxes)
-	{
+	private static boolean addBoxesToList(World world, BlockPos pos, boolean renderSolitaryFullBoxes, List<ColoredBox> boxes) {
 		return addBoxesToList(world, pos, renderSolitaryFullBoxes, null, boxes);
 	}
 
-	private static boolean addBoxesToList(World world, BlockPos pos, boolean renderSolitaryFullBoxes, @Nullable AxisAlignedBB playerBoundingBox, List<ColoredBox> boxes)
-	{
+	private static boolean addBoxesToList(World world, BlockPos pos, boolean renderSolitaryFullBoxes, @Nullable AxisAlignedBB playerBoundingBox, List<ColoredBox> boxes) {
 		IBlockState state = world.getBlockState(pos).getActualState(world, pos);
 		if (state.getBlock().isAir(state, world, pos))
 			return true;
@@ -282,68 +235,59 @@ public class DebugBlockCollision
 		boxesCollision.removeIf(Objects::isNull);
 
 		// Ignore solitary full-blocks
-		if (!renderSolitaryFullBoxes && boxesCollision.size() == 1 && boxesCollision.get(0).equals(Block.FULL_BLOCK_AABB.offset(pos)))
+		if (!renderSolitaryFullBoxes && boxesCollision.size() == 1 && boxesCollision.get(0).equals(Block.FULL_BLOCK_AABB.offset(pos))) {
 			return true;
+		}
 
-		if (boxesCollision.isEmpty())
-		{
+		if (boxesCollision.isEmpty()) {
 			Material material = state.getMaterial();
-			if (material.isLiquid())
+			if (material.isLiquid()) {
 				return true;
+			}
 
 			// Add bounding box for blocks without collision
 			AxisAlignedBB bounds = state.getBoundingBox(world, pos);
-			if (bounds == null)
-				return true;
 
 			bounds = bounds.offset(pos);
-			if (playerBoundingBox == null || playerBoundingBox.intersects(bounds))
+			if (playerBoundingBox == null || playerBoundingBox.intersects(bounds)) {
 				boxes.add(new ColoredBox(bounds, true));
-		}
-		else if (playerBoundingBox == null)
-		{
+			}
+		} else if (playerBoundingBox == null) {
 			// Add all collision boxes (if not in collision mode, since they would have already been added)
 			boxesCollision.forEach(box -> boxes.add(new ColoredBox(box, false)));
 		}
 		return false;
 	}
 
-	private static class ColoredBox extends AxisAlignedBB
-	{
+	private static class ColoredBox extends AxisAlignedBB {
 		private final Color color;
 
-		public ColoredBox(AxisAlignedBB box, boolean isBoundingBox)
-		{
+		public ColoredBox(AxisAlignedBB box, boolean isBoundingBox) {
 			super(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ);
 			color = isBoundingBox ? Color.RED : (box.offset(-box.minX, -box.minY, -box.minZ).equals(Block.FULL_BLOCK_AABB) ? Color.GREEN : Color.BLUE);
 		}
 
-		public void render(double playerX, double playerY, double playerZ)
-		{
+		public void render(double playerX, double playerY, double playerZ) {
 			color.renderBox(this, playerX, playerY, playerZ);
 		}
 	}
 
-	private static enum Color
-	{
+	private enum Color {
 		RED(1, 0, 0),
 		GREEN(0, 1, 0),
 		BLUE(0, 0, 1);
 
 		private final float red, green, blue;
-		private Color(float red, float green, float blue)
-		{
+		Color(float red, float green, float blue) {
 			this.red = red;
 			this.green = green;
 			this.blue = blue;
 		}
 
-		public void renderBox(AxisAlignedBB box, double playerX, double playerY, double playerZ)
-		{
+		public void renderBox(AxisAlignedBB box, double playerX, double playerY, double playerZ) {
 			box = box.offset(-playerX, -playerY, -playerZ);
 			RenderGlobal.drawSelectionBoundingBox(box, red, green, blue, 155 / 255.0F);
-			if (ConfigMod.CLIENT.renderObscuredLines)
-			{
+			if (ConfigMod.CLIENT.renderObscuredLines) {
 				GlStateManager.depthFunc(GL11.GL_GREATER);
 				RenderGlobal.drawSelectionBoundingBox(box, red, green, blue, 28 / 255.0F);
 				GlStateManager.depthFunc(GL11.GL_LEQUAL);

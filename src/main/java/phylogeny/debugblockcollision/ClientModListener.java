@@ -15,11 +15,7 @@ class ClientEventListener {
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             while (keyBind.isPressed() && Keyboard.isKeyDown(Keyboard.KEY_F3)) {
-                try {
-                    DebugBlockCollision.handleOverlay(event);
-                } catch (Exception e) {
-                    LOGGER.error("DebugBlockCollision.handleOverlay(event); threw an exeception, this won't crash the game it just means the overlay isn't working for whatever reason");
-                }
+                DebugBlockCollision.handleOverlay(event);
             }
         }
     }
