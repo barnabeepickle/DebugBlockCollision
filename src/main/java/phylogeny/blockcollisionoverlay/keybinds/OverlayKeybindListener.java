@@ -14,7 +14,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 import phylogeny.blockcollisionoverlay.ConfigMod;
-import phylogeny.debugblockcollision.Tags;
+import phylogeny.blockcollisionoverlay.Tags;
 
 import java.util.ArrayList;
 import java.util.List;
