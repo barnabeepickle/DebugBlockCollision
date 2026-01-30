@@ -5,6 +5,7 @@ import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -30,30 +31,23 @@ public class ModeKeybindListener {
         if (event.phase == TickEvent.Phase.END) {
             if (Keyboard.isKeyDown(Keyboard.KEY_F3)) {
                 while (modeKeybind.isPressed()) {
-                    handleMode();
+                    // Cycle mode
+                    ConfigMod.Mode mode = ConfigMod.CLIENT.mode;
+                    ConfigMod.CLIENT.mode = mode.values()[(mode.ordinal() + 1) % mode.values().length];
+
+                    // Update config file
+                    configFile.load();
+                    Property prop = configFile.get("client", "Mode", ConfigMod.Mode.BLOCK_CROSSHAIR.name());
+                    prop.setValue(ConfigMod.CLIENT.mode.name());
+                    prop.setComment(MODE_COMMENT);
+                    configFile.save();
+
+                    // Send chat message
+                    debugFeedbackTranslated("debug." + Tags.MODID + "." + ConfigMod.CLIENT.mode.getChatKey());
+                    if (ConfigMod.CLIENT.modeDescription) {
+                        debugFeedbackTranslated("debug." + Tags.MODID + "." + ConfigMod.CLIENT.mode.getChatKey() + ".info");
+                    }
                 }
-            }
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static void handleMode() {
-        while (modeKeybind.isPressed()) {
-            // Cycle mode
-            ConfigMod.Mode mode = ConfigMod.CLIENT.mode;
-            ConfigMod.CLIENT.mode = mode.values()[(mode.ordinal() + 1) % mode.values().length];
-
-            // Update config file
-            configFile.load();
-            Property prop = configFile.get("client", "Mode", ConfigMod.Mode.BLOCK_CROSSHAIR.name());
-            prop.setValue(ConfigMod.CLIENT.mode.name());
-            prop.setComment(MODE_COMMENT);
-            configFile.save();
-
-            // Send chat message
-            debugFeedbackTranslated("debug." + Tags.MODID + "." + ConfigMod.CLIENT.mode.getChatKey());
-            if (ConfigMod.CLIENT.modeDescription) {
-                debugFeedbackTranslated("debug." + Tags.MODID + "." + ConfigMod.CLIENT.mode.getChatKey() + ".info");
             }
         }
     }
