@@ -38,21 +38,23 @@ public class ModeKeybindListener {
 
     @SideOnly(Side.CLIENT)
     public static void handleMode() {
-        // Cycle mode
-        ConfigMod.Mode mode = ConfigMod.CLIENT.mode;
-        ConfigMod.CLIENT.mode = mode.values()[(mode.ordinal() + 1) % mode.values().length];
+        while (modeKeybind.isPressed()) {
+            // Cycle mode
+            ConfigMod.Mode mode = ConfigMod.CLIENT.mode;
+            ConfigMod.CLIENT.mode = mode.values()[(mode.ordinal() + 1) % mode.values().length];
 
-        // Update config file
-        configFile.load();
-        Property prop = configFile.get("client", "Mode", ConfigMod.Mode.BLOCK_CROSSHAIR.name());
-        prop.setValue(ConfigMod.CLIENT.mode.name());
-        prop.setComment(MODE_COMMENT);
-        configFile.save();
+            // Update config file
+            configFile.load();
+            Property prop = configFile.get("client", "Mode", ConfigMod.Mode.BLOCK_CROSSHAIR.name());
+            prop.setValue(ConfigMod.CLIENT.mode.name());
+            prop.setComment(MODE_COMMENT);
+            configFile.save();
 
-        // Send chat message
-        debugFeedbackTranslated("debug." + Tags.MODID + "." + ConfigMod.CLIENT.mode.getChatKey());
-        if (ConfigMod.CLIENT.modeDescription) {
-            debugFeedbackTranslated("debug." + Tags.MODID + "." + ConfigMod.CLIENT.mode.getChatKey() + ".info");
+            // Send chat message
+            debugFeedbackTranslated("debug." + Tags.MODID + "." + ConfigMod.CLIENT.mode.getChatKey());
+            if (ConfigMod.CLIENT.modeDescription) {
+                debugFeedbackTranslated("debug." + Tags.MODID + "." + ConfigMod.CLIENT.mode.getChatKey() + ".info");
+            }
         }
     }
 }

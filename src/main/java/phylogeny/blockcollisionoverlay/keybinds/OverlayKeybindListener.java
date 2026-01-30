@@ -45,30 +45,31 @@ public class OverlayKeybindListener {
 
     @SideOnly(Side.CLIENT)
     public static void handleOverlay() {
-        // Toggle enabled and prevent debug screen from toggling on/off
-        // Simplified with the wonders of an AT entry
-        Minecraft.getMinecraft().actionKeyF3 = true;
+        while (overlayKeybind.isPressed()) {
+            // Toggle enabled and prevent debug screen from toggling on/off
+            // Simplified with the wonders of an AT entry
+            Minecraft.getMinecraft().actionKeyF3 = true;
 
-        overlayEnabled ^=true;
+            overlayEnabled ^=true;
 
-        // Send chat message
-        debugFeedbackTranslated("debug." + Tags.MODID + (overlayEnabled ? ".on" : ".off"));
+            // Send chat message
+            debugFeedbackTranslated("debug." + Tags.MODID + (overlayEnabled ? ".on" : ".off"));
 
-        // Display the color key if overlay enabled and it's enabled in the config
-        if (overlayEnabled && ConfigMod.CLIENT.colorKey) {
-            debugFeedbackTranslated("debug." + Tags.MODID + ".color_key");
+            // Display the color key if overlay enabled and it's enabled in the config
+            if (overlayEnabled && ConfigMod.CLIENT.colorKey) {
+                debugFeedbackTranslated("debug." + Tags.MODID + ".color_key");
 
-            List<String> colors = new ArrayList<>();
-            colors.add("green");
-            colors.add("blue");
-            colors.add("red");
+                List<String> colors = new ArrayList<>();
+                colors.add("green");
+                colors.add("blue");
+                colors.add("red");
 
-            for (int i = 0; !(i >= 3); i++) {
-                Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(
-                        new TextComponentTranslation("debug." + Tags.MODID + ".color_key." + colors.get(i))
-                                .setStyle(new Style().setColor(TextFormatting.DARK_GREEN)));
+                for (int i = 0; !(i >= 3); i++) {
+                    Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(
+                            new TextComponentTranslation("debug." + Tags.MODID + ".color_key." + colors.get(i))
+                                    .setStyle(new Style().setColor(TextFormatting.DARK_GREEN)));
+                }
             }
-
         }
     }
 }
