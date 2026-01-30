@@ -14,10 +14,13 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +31,7 @@ import phylogeny.debugblockcollision.keybinds.ModeKeybindListener;
 import phylogeny.debugblockcollision.keybinds.OverlayKeybindListener;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -52,13 +56,27 @@ public class DebugBlockCollision
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		if (configFile == null) {
-			configFile = new Configuration(event.getSuggestedConfigurationFile());
-			configFile.load();
-		}
+		getConfigFile(event);
 
 		OverlayKeybindListener.init();
 		ModeKeybindListener.init();
+	}
+
+	private static void getConfigFile(FMLPreInitializationEvent event) {
+		if (configFile == null) {
+			if (event.getSuggestedConfigurationFile().exists()) {
+				try {
+					ConfigManager.sync(Tags.MODID, Config.Type.INSTANCE);
+					configFile = new Configuration(event.getSuggestedConfigurationFile());
+				} catch (RuntimeException e) {
+					String path = event.getSuggestedConfigurationFile().getAbsolutePath();
+                    //noinspection ResultOfMethodCallIgnored
+                    event.getSuggestedConfigurationFile().delete();
+					configFile = new Configuration(new File(path));
+				}
+			}
+			configFile.load();
+		}
 	}
 
 	public static void debugFeedbackTranslated(String keySuffix) {
