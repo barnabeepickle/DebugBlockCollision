@@ -4,6 +4,14 @@ A client-side mod that adds a new F3 debug overlay showing you exact block colli
 
 ## About
 
+### Features
+
+ - Toggleable overlay, default keybind `F3 + O`.
+ - Multiple overlay modes, default keybind `F3 + I`.
+ - Config file which allows you to set the overlay mode, the level of chat feedback and line rendering settings.
+ - In-game configuration through Forge that is dynamicly reloaded.
+ - Has been tested with [Cleanroom Loader](https://github.com/CleanroomMC/Cleanroom) (0.4.2-alpha) and [Celeritas](https://git.taumc.org/embeddedt/celeritas).
+
 ### Usage
 
 The main way to interact with this mods is by using the `F3 + KEY` keybinds which by default are `F3 + O` to toggle the overlay on/off and `F3 + I` to change the overlay mode.
