@@ -1,4 +1,4 @@
-package phylogeny.debugblockcollision;
+package phylogeny.blockcollisionoverlay;
 
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.Config.*;

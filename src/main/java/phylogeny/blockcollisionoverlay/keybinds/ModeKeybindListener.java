@@ -1,4 +1,4 @@
-package phylogeny.debugblockcollision.keybinds;
+package phylogeny.blockcollisionoverlay.keybinds;
 
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.settings.KeyConflictContext;
@@ -10,10 +10,10 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
-import phylogeny.debugblockcollision.ConfigMod;
+import phylogeny.blockcollisionoverlay.ConfigMod;
 import phylogeny.debugblockcollision.Tags;
 
-import static phylogeny.debugblockcollision.DebugBlockCollision.*;
+import static phylogeny.blockcollisionoverlay.DebugBlockCollision.*;
 
 public class ModeKeybindListener {
     public static KeyBinding modeKeybind;

@@ -1,4 +1,4 @@
-package phylogeny.debugblockcollision.keybinds;
+package phylogeny.blockcollisionoverlay.keybinds;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
@@ -13,14 +13,14 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
-import phylogeny.debugblockcollision.ConfigMod;
+import phylogeny.blockcollisionoverlay.ConfigMod;
 import phylogeny.debugblockcollision.Tags;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static phylogeny.debugblockcollision.DebugBlockCollision.debugFeedbackTranslated;
-import static phylogeny.debugblockcollision.DebugBlockCollision.overlayEnabled;
+import static phylogeny.blockcollisionoverlay.DebugBlockCollision.debugFeedbackTranslated;
+import static phylogeny.blockcollisionoverlay.DebugBlockCollision.overlayEnabled;
 
 public class OverlayKeybindListener {
     public static KeyBinding overlayKeybind;

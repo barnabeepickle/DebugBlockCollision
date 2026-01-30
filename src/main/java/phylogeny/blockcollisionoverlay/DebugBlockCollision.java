@@ -1,4 +1,4 @@
-package phylogeny.debugblockcollision;
+package phylogeny.blockcollisionoverlay;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -20,15 +20,14 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
-import phylogeny.debugblockcollision.ConfigMod.Mode;
-import phylogeny.debugblockcollision.keybinds.ModeKeybindListener;
-import phylogeny.debugblockcollision.keybinds.OverlayKeybindListener;
+import phylogeny.blockcollisionoverlay.ConfigMod.Mode;
+import phylogeny.blockcollisionoverlay.keybinds.ModeKeybindListener;
+import phylogeny.blockcollisionoverlay.keybinds.OverlayKeybindListener;
 
 import javax.annotation.Nullable;
 import java.io.File;
