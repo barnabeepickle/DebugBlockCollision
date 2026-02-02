@@ -4,6 +4,10 @@ A client-side mod that adds a new F3 debug overlay showing you exact block colli
 
 ## About
 
+[Original Mod's Github](https://github.com/Phylogeny/DebugBlockCollision) - [Original Mod's Curseforge](https://www.curseforge.com/minecraft/mc-mods/debug-block-collision)
+
+[Modrinth](https://modrinth.com/mod/debug-block-collision-reloaded)
+
 ### Features
 
  - Toggleable overlay, default keybind `F3 + O`.
