@@ -24,22 +24,15 @@ There is also a config file which is dynamicly reloaded and can be edited in gam
 
 <!-- TODO: Write instructions with screenshots -->
 
-### History
+### Why
 
-This mod was originally created by [Phylogeny](https://github.com/Phylogeny) who original came up with the idea for the mod and released it on September 1st, 2018.
+Well working on [ProjectE-Charms](https://github.com/barnabeepickle/projecte-charm) I had to create some custom collision for a block but was having trouble visualizing the boxes so I looked on curseforge for mod that would help me do that, I ended up on [Debug Block Collision](https://www.curseforge.com/minecraft/mc-mods/debug-block-collision)'s Curseforge so I downloaded it. After I had used it for a little bit on the [Cleanroom Mod Loader](https://github.com/CleanroomMC/Cleanroom) I noticed a few main issues:
 
-On January 28th, 2026 I came across this mod well developing a ProjectE addon called [ProjectE Charms](https://github.com/barnabeepickle/projecte-charm) since I wanted a way to see exact collisions on a block I was adding. The problem I found was that actually using the mod was a bit clunky so when I found that the source code was on Github I decided give a crack at improving it, so I forked it.
+- The keybind handling had broken debouce (actually a Cleanroom issue with modifier keys).
+- Toggling modes was clunky since there was only one keybind.
+- And the text and formatting could do with some improvement.
 
-Subsequently I did the following:
-
- - Rebuilt the Gradle toolchain using [ForgeDevEnv](https://github.com/CleanroomMC/ForgeDevEnv).
- - Leveraging some custom code I originally wrote for [Make Panorama](https://github.com/barnabeepickle/MakePanorama) (it can be under the Unlicense since I originally wrote it) transplanted the original handling code to start on improving keybind detection and debounce.
- - Removed some janky [reflection](https://en.wikipedia.org/wiki/Reflective_programming) code and simplified it with an [Access Transformer](https://docs.minecraftforge.net/en/latest/advanced/accesstransformers/).
- - Started reworking the lang file and some of the corresponding code.
- - Replaced my single some what scattered keybind handler with two making it both easier to use and develop.
- - Finished the lang file rework along with adding two new config options.
-
-Overall this rework only took me about a day with the new 2.0.0 version being done on January 29th, 2026.
+All of this inspired me to improve this mod by adding a second keybind, improving Cleanroom compatibility and rewriting the `lang` file; so I did.
 
 ## Modpacks
 
